@@ -76,13 +76,16 @@ class API:
             flags += 8
         return flags
 
-    def getItems(self, tags="", user="", older="", newer=""):
+    def getItems(self, tags="", user="", older="", newer="", images=True, videos=True):
         items = self.search(tags, user, older, newer)
         for item in items:
-            item.setTagsFromJSON(self.getTags(item.id))
+            if (item.isImage() and images) \
+                    or (item.isVideo() and videos):
+                item.setTagsFromJSON(self.getTags(item.id))
+            else:
+                items.remove(item)
         items.sort(reverse=True)
         return items
-
 
     def search(self, tags="", user="", older="", newer=""):
         args = {
