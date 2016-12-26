@@ -140,12 +140,23 @@ class API:
         return info["tags"]
 
     def downloadMedia(self, item, save_dir=".", file_name="", extension=""):
-        image_url = self.getImageUrlPrefix() + "/" + item.image_link
-        if not file_name:
-            file_name = item.image_link.split("/")[-1]
-        if not extension:
-            extension = item.image_link.split(".")[-1]
-        target_path = str(save_dir) + "/" + str(file_name) + "." + str(extension)
-        with open(target_path, "wb") as f:
-            f.write(requests.get(image_url).content)
+        url = self.getImageUrlPrefix() + "/" + item.image_link
+        self.download(url, save_dir, file_name, extension)
 
+    def downloadThumbnail(self, item, save_dir=".", file_name="", extension=""):
+        url = self.getThumbUrlPrefix() + "/" + item.thumb_link
+        self.download(url, save_dir, file_name, extension)
+
+    def downloadFullsize(self, item, save_dir=".", file_name="", extension=""):
+        url = self.getFullSizeUrlPrefix() + "/" + item.full_size_link
+        self.download(url, save_dir, file_name, extension)
+
+    def download(self, url, save_dir, file_name="", extension=""):
+        if not file_name:
+            file_name = url.split("/")[-1]
+        if not extension:
+            extension = url.split(".")[-1]
+        target_path = str(save_dir) + "/" + \
+            str(file_name) + "." + str(extension)
+        with open(target_path, "wb") as f:
+            f.write(requests.get(url).content)
