@@ -1,8 +1,13 @@
 import pr0gramm
 
+# Requests items older than some promoted tag
 api = pr0gramm.API()
 api.enableSFW()
-items = api.getItems(tags="", user="", older="", newer="204777", videos=False)
+items = api.getItemsOlder("204477")
+print items[0].description()
 
-for item in items:
-    print item.description()
+
+
+# Tests with Mock Object
+mock = api.createMockItem()
+print mock.description()
