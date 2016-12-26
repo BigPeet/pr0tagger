@@ -6,9 +6,14 @@ python-pr0gramm-api by David Mann <daaavid.mann@gmail.com>
 
 """
 
+__author__ = "Peter Wolf"
+__mail__ = "pwolf2310@gmail.com"
+__date__ = "2016-12-25"
+
 import json
 import requests
 from Item import Item
+
 
 PROTOCOL_PREFIX = "http://"
 SECURE_PROTOCOL_PREFIX = "https://"

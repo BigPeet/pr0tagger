@@ -1,4 +1,8 @@
 
+__author__ = "Peter Wolf"
+__mail__ = "pwolf2310@gmail.com"
+__date__ = "2016-12-25"
+
 class Tag:
 
     """ Tag for an pr0gramm Item"""

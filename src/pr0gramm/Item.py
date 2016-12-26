@@ -2,6 +2,11 @@ from Tag import Tag
 import time
 from datetime import datetime
 
+__author__ = "Peter Wolf"
+__mail__ = "pwolf2310@gmail.com"
+__date__ = "2016-12-25"
+
+
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
