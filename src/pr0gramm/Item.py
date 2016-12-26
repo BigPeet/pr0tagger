@@ -1,5 +1,6 @@
 from Tag import Tag
 import time
+from datetime import datetime
 
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -64,6 +65,9 @@ class Item:
     def isVideo(self):
         return self.image_link.endswith(".mp4") \
             or self.image_link.endswith(".gif")
+
+    def getAge(self):
+        return datetime.now() - datetime.fromtimestamp(self.created)
 
     def setTagsFromJSON(self, json_tags):
         self.tags = []
