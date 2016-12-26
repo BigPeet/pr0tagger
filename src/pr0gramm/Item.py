@@ -74,6 +74,9 @@ class Item:
     def getAge(self):
         return datetime.now() - datetime.fromtimestamp(self.created)
 
+    def getSortId(self):
+        return self.promoted_stamp
+
     def setTagsFromJSON(self, json_tags):
         self.tags = []
         for json_tag in json_tags:
