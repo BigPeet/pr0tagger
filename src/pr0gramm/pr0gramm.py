@@ -139,3 +139,13 @@ class API:
         info = self.getInfo(post_id)
         return info["tags"]
 
+    def downloadMedia(self, item, save_dir=".", file_name="", extension=""):
+        image_url = self.getImageUrlPrefix() + "/" + item.image_link
+        if not file_name:
+            file_name = item.image_link.split("/")[-1]
+        if not extension:
+            extension = item.image_link.split(".")[-1]
+        target_path = str(save_dir) + "/" + str(file_name) + "." + str(extension)
+        with open(target_path, "wb") as f:
+            f.write(requests.get(image_url).content)
+
