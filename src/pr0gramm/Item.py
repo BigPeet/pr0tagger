@@ -95,3 +95,21 @@ class Item:
         parsed_item.downvotes = json_item["down"]
         parsed_item.flags = json_item["flags"]
         return parsed_item
+
+    @staticmethod
+    def mockItem():
+        mock = Item(1679829)
+        mock.promoted_stamp = 204476
+        mock.user = "ExampleUser"
+        mock.created = 1482583310
+        mock.image_link = "2016/12/24/058d591eb1eddbd3.mp4"
+        mock.image_width = 640
+        mock.image_height = 360
+        mock.thumb_link = "2016/12/24/058d591eb1eddbd3.jpg"
+        mock.full_size_link = ""
+        mock.source = ""
+        mock.audio = False
+        mock.upvotes = 699
+        mock.downvotes = 11
+        mock.flags = 1
+        return mock

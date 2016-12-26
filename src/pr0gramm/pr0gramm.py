@@ -76,6 +76,9 @@ class API:
             flags += 8
         return flags
 
+    def createMockItem(self):
+        return Item.mockItem()
+
     def getAllImagesNewer(self, timestamp):
         return self.getItemsNewer(timestamp, videos=False)
 
@@ -135,3 +138,4 @@ class API:
     def getTags(self, post_id):
         info = self.getInfo(post_id)
         return info["tags"]
+
