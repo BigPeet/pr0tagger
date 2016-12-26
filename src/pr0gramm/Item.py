@@ -62,7 +62,8 @@ class Item:
             or self.image_link.endswith(".png")
 
     def isVideo(self):
-        return self.image_link.endswith(".mp4")
+        return self.image_link.endswith(".mp4") \
+            or self.image_link.endswith(".gif")
 
     def setTagsFromJSON(self, json_tags):
         self.tags = []
