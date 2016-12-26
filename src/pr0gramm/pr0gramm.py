@@ -76,6 +76,20 @@ class API:
             flags += 8
         return flags
 
+    def getAllImagesNewer(self, timestamp):
+        return self.getItemsNewer(timestamp, videos=False)
+
+    def getAllImagesOlder(self, timestamp):
+        return self.getItemsOlder(timestamp, videos=False)
+
+    def getItemsNewer(self, timestamp, tags="", user="", images=True, videos=True):
+        return self.getItems(
+            tags=tags, user=user, newer=timestamp, images=images, videos=videos)
+
+    def getItemsOlder(self, timestamp, tags="", user="", images=True, videos=True):
+        return self.getItems(
+            tags=tags, user=user, older=timestamp, images=images, videos=videos)
+
     def getItems(self, tags="", user="", older="", newer="", images=True, videos=True):
         items = self.search(tags, user, older, newer)
         for item in items:
