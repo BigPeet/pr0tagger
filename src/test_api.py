@@ -7,7 +7,7 @@ items = api.getItemsOlder("204477")
 print items[0].description()
 
 
-
 # Tests with Mock Object
 mock = api.createMockItem()
 print mock.description()
+print api.downloadMedia(mock, save_dir="/tmp")

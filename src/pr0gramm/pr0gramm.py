@@ -154,25 +154,31 @@ class API:
 
     def downloadMedia(self, item, save_dir=".", file_name="", extension=""):
         url = self.getImageUrlPrefix() + "/" + item.image_link
-        self.download(url, save_dir, file_name, extension)
+        return self.download(url, save_dir, file_name, extension)
 
     def downloadThumbnail(self, item, save_dir=".", file_name="", extension=""):
         url = self.getThumbUrlPrefix() + "/" + item.thumb_link
-        self.download(url, save_dir, file_name, extension)
+        return self.download(url, save_dir, file_name, extension)
 
     def downloadFullsize(self, item, save_dir=".", file_name="", extension=""):
         if item.full_size_link:
             url = self.getFullSizeUrlPrefix() + "/" + item.full_size_link
-            self.download(url, save_dir, file_name, extension)
+            return self.download(url, save_dir, file_name, extension)
         else:
-            self.downloadMedia(item, save_dir, file_name, extension)
+            return self.downloadMedia(item, save_dir, file_name, extension)
 
     def download(self, url, save_dir, file_name="", extension=""):
         if not file_name:
+            # take the file name from the url, but remove extension
+            # in case some other extension is provided
             file_name = url.split("/")[-1]
+            file_extension = "." + file_name.split(".")[-1]
+            file_name = file_name[:-len(file_extension)]
         if not extension:
+            # take the extension from the url
             extension = url.split(".")[-1]
         target_path = str(save_dir) + "/" + \
             str(file_name) + "." + str(extension)
         with open(target_path, "wb") as f:
             f.write(requests.get(url).content)
+        return target_path
