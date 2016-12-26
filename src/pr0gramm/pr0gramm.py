@@ -161,8 +161,11 @@ class API:
         self.download(url, save_dir, file_name, extension)
 
     def downloadFullsize(self, item, save_dir=".", file_name="", extension=""):
-        url = self.getFullSizeUrlPrefix() + "/" + item.full_size_link
-        self.download(url, save_dir, file_name, extension)
+        if item.full_size_link:
+            url = self.getFullSizeUrlPrefix() + "/" + item.full_size_link
+            self.download(url, save_dir, file_name, extension)
+        else:
+            self.downloadMedia(item, save_dir, file_name, extension)
 
     def download(self, url, save_dir, file_name="", extension=""):
         if not file_name:
