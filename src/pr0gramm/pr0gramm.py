@@ -29,6 +29,8 @@ class API:
         self.nsfp = False
         self.nsfl = False
         self.promoted = True
+        self.images = True
+        self.videos = True
 
     def getBaseAPIUrl(self):
         return self.protocol_prefix + HOST_NAME + "/api"
@@ -66,6 +68,18 @@ class API:
     def disableNSFP(self):
         self.nsfp = False
 
+    def enableImages(self):
+        self.images = True
+
+    def disableImages(self):
+        self.images = False
+
+    def enableVideos(self):
+        self.videos = True
+
+    def disableVideos(self):
+        self.videos = False
+
     def setPromoted(self, value):
         self.promoted = value
 
@@ -84,25 +98,19 @@ class API:
     def createMockItem(self):
         return Item.mockItem()
 
-    def getAllImagesNewer(self, timestamp):
-        return self.getItemsNewer(timestamp, videos=False)
-
-    def getAllImagesOlder(self, timestamp):
-        return self.getItemsOlder(timestamp, videos=False)
-
-    def getItemsNewer(self, timestamp, tags="", user="", images=True, videos=True):
+    def getItemsNewer(self, item_id, tags="", user=""):
         return self.getItems(
-            tags=tags, user=user, newer=timestamp, images=images, videos=videos)
+            tags=tags, user=user, newer=item_id)
 
-    def getItemsOlder(self, timestamp, tags="", user="", images=True, videos=True):
+    def getItemsOlder(self, item_id, tags="", user=""):
         return self.getItems(
-            tags=tags, user=user, older=timestamp, images=images, videos=videos)
+            tags=tags, user=user, older=item_id)
 
-    def getItems(self, tags="", user="", older="", newer="", images=True, videos=True):
+    def getItems(self, tags="", user="", older="", newer=""):
         items = self.search(tags, user, older, newer)
         for item in items:
-            if (item.isImage() and images) \
-                    or (item.isVideo() and videos):
+            if (item.isImage() and self.images) \
+                    or (item.isVideo() and self.videos):
                 item.setTagsFromJSON(self.getTags(item.id))
             else:
                 items.remove(item)
