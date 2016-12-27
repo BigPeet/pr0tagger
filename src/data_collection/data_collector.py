@@ -1,6 +1,8 @@
 from datetime import timedelta
 import json
-
+from os import listdir
+from os.path import isfile, join
+import pr0gramm
 
 __author__ = "Peter Wolf"
 __mail__ = "pwolf2310@gmail.com"
@@ -25,6 +27,7 @@ class DataCollector:
         self.media_directory = "/tmp"
         self.data_source = DataSources.IMAGE
         self.annotation_file = "/tmp/annotation.txt"
+        self.json_dir = "/tmp"
 
     def setAgeThreshold(days=0, hours=5, minutes=0, seconds=0):
         self.age_threshold = timedelta(
@@ -51,6 +54,9 @@ class DataCollector:
     def setAnnotationFile(self, annotation_file):
         self.annotation_file = annotation_file
 
+    def setJsonDir(self, directory):
+        self.json_dir = directory
+
     def download(self, item):
         if self.data_source == DataSources.IMAGE:
             return self.api.downloadMedia(
@@ -68,20 +74,47 @@ class DataCollector:
     def writeAnnotation(self, item, media_path):
         # write every item as a line with the following structure:
         # ID;IMAGE_PATH;AMOUNT_OF_TAGS;...TAG_TEXT;TAG_CONFIDENCE;...
-        #TODO: maybe handle duplicate entries
+        # TODO: maybe handle duplicate entries
         with open(self.annotation_file, "a") as f:
-            line = str(item.id) + ";" + str(media_path) + \
-                ";" + str(len(item.tags)) + ";"
+            line = str(item.id) + ";"
+            line += str(media_path) + ";"
+            line += str(len(item.tags)) + ";"
             line += ";".join([str(tag.getText()) + ";" +
                               str(tag.getConfidence()) for tag in item.tags])
             f.write(line + "\n")
 
-    def collectDataBatch(self):
-        data = []
+    def getItemsFromAPI(self):
         if self.search_forwards:
-            data = self.api.getItemsNewer(self.last_id)
+            return self.api.getItemsNewer(self.last_id)
         else:
-            data = self.api.getItemsOlder(self.last_id)
+            return self.api.getItemsOlder(self.last_id)
+
+    def getItemsFromLocalStorage(self):
+        json_files = [join(self.json_dir, f) for f in listdir(self.json_dir)
+                      if isfile(join(self.json_dir, f)) and f.endswith(".json")]
+
+        data = []
+        for json_file in json_files:
+            with open(json_file, "r") as f:
+                json_item = json.load(f)
+                item = pr0gramm.Item.Item.parseFromJSON(json_item)
+                if not self.last_id \
+                        or (self.search_forwards and item.getSortId() > self.last_id) \
+                        or (not self.search_forwards and item.getSortId() < self.last_id):
+                    data.append(item)
+        data.sort(reverse=True)
+        return data
+
+    def collectDataBatch(self, download=True, save_json=False, data=[], local_data=False):
+        # retrieve data if none has been given
+        if not data:
+            if local_data:
+                data = self.getItemsFromLocalStorage()
+            else:
+                data = self.getItemsFromAPI()
+
+        if not data:
+            return
 
         # filter data based on age and tags
         valid_data = []
@@ -98,11 +131,15 @@ class DataCollector:
         else:
             self.last_id = valid_data[-1].getSortId()
 
-        # download media
         for item in valid_data:
-            target_path = self.download(item)
-            if target_path:
-                # write id(s), link to media and tags to file
-                self.writeAnnotation(item, target_path)
+            if download:
+                # download media
+                target_path = self.download(item)
+                if target_path:
+                    # write id(s), link to media and tags to file
+                    self.writeAnnotation(item, target_path)
+            if save_json:
+                with open(self.json_dir + "/" + str(item.id) + ".json", "w") as f:
+                    json.dump(item.asDict(), f)
 
         return self.last_id
