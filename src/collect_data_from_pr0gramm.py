@@ -38,8 +38,8 @@ def main():
     parser.add_argument("--json_directory", "-jd",
                         help="the download directory for the retrieved json content", type=str, default="/tmp")
     parser.add_argument("--data_source", "-ds",
-                        help="the type of source that should be used when downloading media (0=IMAGE, 1=THUMBNAIL, 2=FULL_SIZE)",
-                        type=int, choices=range(3))
+                        help="the type of source that should be used when downloading media (0=IMAGE, 1=THUMBNAIL, 2=FULL_SIZE), Default: 0",
+                        type=int, choices=range(3), default=0)
 
     parser.add_argument("--no_download", "-nd",
                         help="disables downloading the media content for submissions", action="store_true")
@@ -50,7 +50,7 @@ def main():
                         action="store_true")
 
     parser.add_argument(
-        "--frequency", "-f", help="set the frequency of lookups in hours (Default: 5)", type=int, default=5)
+        "--waiting_time", "-t", help="set the waiting time for lookups in hours (Default: 5)", type=int, default=5)
 
     args = parser.parse_args()
     run_collection_process(args)
