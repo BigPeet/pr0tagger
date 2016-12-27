@@ -3,11 +3,13 @@ import json
 from os import listdir
 from os.path import isfile, join
 import pr0gramm
+import logging
 
 __author__ = "Peter Wolf"
 __mail__ = "pwolf2310@gmail.com"
 __date__ = "2016-12-26"
 
+LOG = logging.getLogger(__name__)
 
 class DataSources:
     IMAGE, THUMBNAIL, FULL_SIZE = range(3)

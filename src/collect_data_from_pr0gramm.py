@@ -4,6 +4,10 @@ import datetime
 import argparse
 import pr0gramm
 import data_collection
+import logging_setup
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
 def main():
@@ -55,6 +59,17 @@ def main():
     parser.add_argument(
         "--waiting_time", "-t", help="set the waiting time for lookups in hours (Default: 5)", type=int, default=5)
 
+    parser.add_argument("logging_json_config", "-lc",
+                        help="the logging json dictionary used to initialize the logging framework (Default: ../etc/logging.json)",
+                        type=str,
+                        default="../etc/logging.json")
+
+    parser.add_argument("logging_file", "-lf",
+                        help="specify a log file, per default the log file is chosen based on the logging_json_config",
+                        type=str,
+                        default=None)
+
+    logging_setup.setup_logging(args.logging_json_config, log_file=args.logging_file)
     args = parser.parse_args()
     run_collection_process(args)
 
@@ -64,20 +79,14 @@ def run_collection_process(args):
     waiting_time_in_seconds = args.waiting_time * 60 * 60
 
     while(True):
-        sys.stdout.write("Collecting from {}.".format(collector.getLastId()))
-        sys.stdout.flush()
-
-        # collecting
+        LOG.info("Start collecting from ID: {}.".format(collector.getLastId()))
         collector.collectDataBatch()
-
-        sys.stdout.write(
-            " Reached: {0}. Collected {1} items.\n".format(
-                collector.getLastId(),
-                collector.getSizeOfLastBatch()))
-        sys.stdout.write("Going to sleep for {0} hours until {1}\n".format(
+        LOG.info("Collected {0} item(s). Last ID: {1}".format(
+            collector.getSizeOfLastBatch(),
+            collector.getLastId()))
+        LOG.info("Going to sleep for {0} hours until {1}.".format(
             args.waiting_time,
             datetime.datetime.now() + datetime.timedelta(hours=args.waiting_time)))
-        sys.stdout.flush()
 
         # TODO: give some status updates while waiting
         time.sleep(waiting_time_in_seconds)

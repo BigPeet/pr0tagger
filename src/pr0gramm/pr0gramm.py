@@ -13,8 +13,10 @@ __date__ = "2016-12-25"
 import json
 import requests
 import time
+import logging
 from Item import Item
 
+LOG = logging.getLogger(__name__)
 
 PROTOCOL_PREFIX = "http://"
 SECURE_PROTOCOL_PREFIX = "https://"
@@ -133,11 +135,13 @@ class API:
             args["promoted"] = 1
 
         url = self.getBaseAPIUrl() + "/items/get"
+        LOG.debug("Request {0} with {1}".format(url, args))
         response = requests.get(url, params=args)
         response.raise_for_status()
         search_results = []
         for item in response.json()["items"]:
             search_results.append(Item.parseFromJSON(item))
+        LOG.debug("Retrieved {} objects.".format(len(search_results)))
         return search_results
 
     def getInfo(self, post_id):
