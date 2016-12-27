@@ -31,7 +31,7 @@ class API:
         self.nsfl = False
         self.promoted = True
         self.images = True
-        self.videos = True
+        self.videos = False
         self.waiting_time = 0.1
 
     def getBaseAPIUrl(self):
