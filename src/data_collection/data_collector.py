@@ -68,6 +68,7 @@ class DataCollector:
     def writeAnnotation(self, item, media_path):
         # write every item as a line with the following structure:
         # ID;IMAGE_PATH;AMOUNT_OF_TAGS;...TAG_TEXT;TAG_CONFIDENCE;...
+        #TODO: maybe handle duplicate entries
         with open(self.annotation_file, "a") as f:
             line = str(item.id) + ";" + str(media_path) + \
                 ";" + str(len(item.tags)) + ";"
