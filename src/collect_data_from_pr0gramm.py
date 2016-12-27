@@ -84,9 +84,9 @@ def run_collection_process(args):
 
 
 def initialize_collector(args):
-    api=initialize_api(args)
+    api = initialize_api(args)
 
-    collector=data_collection.DataCollector(api)
+    collector = data_collection.DataCollector(api)
     collector.setLastId(args.last_id)
     collector.setAgeThreshold(hours=args.age_threshold)
     collector.setMinimumNumberOfTags(args.min_num_of_tags)
@@ -104,7 +104,7 @@ def initialize_collector(args):
 
 
 def initialize_api(args):
-    api=pr0gramm.API()
+    api = pr0gramm.API()
     if args.no_sfw:
         api.disableSFW()
     if args.nsfw:
