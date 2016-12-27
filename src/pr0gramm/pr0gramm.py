@@ -153,16 +153,16 @@ class API:
         return info["tags"]
 
     def downloadMedia(self, item, save_dir=".", file_name="", extension=""):
-        url = self.getImageUrlPrefix() + "/" + item.image_link
+        url = self.getImageUrlPrefix() + "/" + item.getMediaLink()
         return self.download(url, save_dir, file_name, extension)
 
     def downloadThumbnail(self, item, save_dir=".", file_name="", extension=""):
-        url = self.getThumbUrlPrefix() + "/" + item.thumb_link
+        url = self.getThumbUrlPrefix() + "/" + item.getThumbnailLink()
         return self.download(url, save_dir, file_name, extension)
 
     def downloadFullsize(self, item, save_dir=".", file_name="", extension=""):
-        if item.full_size_link:
-            url = self.getFullSizeUrlPrefix() + "/" + item.full_size_link
+        if item.getFullsizeLink():
+            url = self.getFullSizeUrlPrefix() + "/" + item.getFullsizeLink()
             return self.download(url, save_dir, file_name, extension)
         else:
             return self.downloadMedia(item, save_dir, file_name, extension)

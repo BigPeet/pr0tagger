@@ -17,25 +17,25 @@ class Item:
     def __init__(self, id):
         self.id = id
         self.tags = []
-        self.promoted_stamp = None
+        self.promoted = None
         self.user = None
         self.created = None
 
-        self.image_link = ""
-        self.image_width = -1
-        self.image_height = -1
-        self.thumb_link = ""
-        self.full_size_link = None
+        self.image = ""
+        self.width = -1
+        self.height = -1
+        self.thumb = ""
+        self.fullsize = None
         self.source = None
         self.audio = False
 
-        self.upvotes = -1
-        self.downvotes = -1
+        self.up = -1
+        self.down = -1
         self.flags = 0
 
     def __str__(self):
         return "Item {0}, Promoted: {1}, Created: {3}, User: {2}".format(
-            self.id, self.promoted_stamp, self.user,
+            self.id, self.promoted, self.user,
             time.strftime(DATE_FORMAT, time.localtime(self.created)))
 
     def __lt__(self, other):
@@ -50,32 +50,46 @@ class Item:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def asDict(self):
+        d = self.__dict__
+        d["tags"] = [tag.__dict__ for tag in self.tags]
+        return d
+
     def description(self):
         return "Item {0}, Promoted: {1}, Created: {3}, User: {2}\n".format(
-            self.id, self.promoted_stamp, self.user,
+            self.id, self.promoted, self.user,
             time.strftime(DATE_FORMAT, time.localtime(self.created))) \
             + "Image: {0} ({1}x{2})\n".format(
-            self.image_link, self.image_width, self.image_height) \
-            + "Thumb: {0}\n".format(self.thumb_link) \
-            + "Full Size: {0}\n".format(self.full_size_link) \
+            self.image, self.width, self.height) \
+            + "Thumb: {0}\n".format(self.thumb) \
+            + "Full Size: {0}\n".format(self.fullsize) \
             + "Source: {0}\n".format(self.source) \
-            + "Flags: {0}, {1} Upvotes, {2} Downvotes\n".format(
-                self.flags, self.upvotes, self.downvotes) \
+            + "Flags: {0}, {1} up, {2} down\n".format(
+                self.flags, self.up, self.down) \
             + "Tags: {}".format(", ".join([str(tag) for tag in self.tags]))
 
     def isImage(self):
-        return self.image_link.endswith(".jpg") \
-            or self.image_link.endswith(".png")
+        return self.image.endswith(".jpg") \
+            or self.image.endswith(".png")
 
     def isVideo(self):
-        return self.image_link.endswith(".mp4") \
-            or self.image_link.endswith(".gif")
+        return self.image.endswith(".mp4") \
+            or self.image.endswith(".gif")
 
     def getAge(self):
         return datetime.now() - datetime.fromtimestamp(self.created)
 
     def getSortId(self):
-        return self.promoted_stamp
+        return self.promoted
+
+    def getMediaLink(self):
+        return self.image
+
+    def getThumbnailLink(self):
+        return self.thumb
+
+    def getFullsizeLink(self):
+        return self.fullsize
 
     def setTagsFromJSON(self, json_tags):
         self.tags = []
@@ -89,35 +103,43 @@ class Item:
     @staticmethod
     def parseFromJSON(json_item):
         parsed_item = Item(json_item["id"])
-        parsed_item.promoted_stamp = json_item["promoted"]
+        parsed_item.promoted = json_item["promoted"]
         parsed_item.user = json_item["user"]
         parsed_item.created = json_item["created"]
-        parsed_item.image_link = json_item["image"]
-        parsed_item.image_width = json_item["width"]
-        parsed_item.image_height = json_item["height"]
-        parsed_item.thumb_link = json_item["thumb"]
-        parsed_item.full_size_link = json_item["fullsize"]
+        parsed_item.image = json_item["image"]
+        parsed_item.width = json_item["width"]
+        parsed_item.height = json_item["height"]
+        parsed_item.thumb = json_item["thumb"]
+        parsed_item.fullsize = json_item["fullsize"]
         parsed_item.source = json_item["source"]
         parsed_item.audio = json_item["audio"]
-        parsed_item.upvotes = json_item["up"]
-        parsed_item.downvotes = json_item["down"]
+        parsed_item.up = json_item["up"]
+        parsed_item.down = json_item["down"]
         parsed_item.flags = json_item["flags"]
+        parsed_item.tags = []
+        if "tags" in json_item.keys():
+            for json_tag in json_item["tags"]:
+                tag = Tag(json_tag["id"],
+                          json_tag["confidence"],
+                          json_tag["tag"])
+                parsed_item.tags.append(tag)
+
         return parsed_item
 
     @staticmethod
     def mockItem():
         mock = Item(1679829)
-        mock.promoted_stamp = 204476
+        mock.promoted = 204476
         mock.user = "ExampleUser"
         mock.created = 1482583310
-        mock.image_link = "2016/12/24/058d591eb1eddbd3.mp4"
-        mock.image_width = 640
-        mock.image_height = 360
-        mock.thumb_link = "2016/12/24/058d591eb1eddbd3.jpg"
-        mock.full_size_link = ""
+        mock.image = "2016/12/24/058d591eb1eddbd3.mp4"
+        mock.width = 640
+        mock.height = 360
+        mock.thumb = "2016/12/24/058d591eb1eddbd3.jpg"
+        mock.fullsize = ""
         mock.source = ""
         mock.audio = False
-        mock.upvotes = 699
-        mock.downvotes = 11
+        mock.up = 699
+        mock.down = 11
         mock.flags = 1
         return mock

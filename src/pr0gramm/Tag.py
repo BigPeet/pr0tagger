@@ -7,14 +7,14 @@ class Tag:
 
     """ Tag for an pr0gramm Item"""
 
-    def __init__(self, id, confidence=None, text=None):
+    def __init__(self, id, confidence=None, tag=None):
         self.id = id
         self.confidence = confidence
-        self.text = text
+        self.tag = tag
 
 
     def getText(self):
-        return self.text.encode("utf8")
+        return self.tag.encode("utf8")
 
     def getConfidence(self):
         return self.confidence
