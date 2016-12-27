@@ -12,6 +12,7 @@ __date__ = "2016-12-25"
 
 import json
 import requests
+import time
 from Item import Item
 
 
@@ -31,6 +32,7 @@ class API:
         self.promoted = True
         self.images = True
         self.videos = True
+        self.waiting_time = 0.1
 
     def getBaseAPIUrl(self):
         return self.protocol_prefix + HOST_NAME + "/api"
@@ -181,4 +183,5 @@ class API:
             str(file_name) + "." + str(extension)
         with open(target_path, "wb") as f:
             f.write(requests.get(url).content)
+            time.sleep(self.waiting_time)
         return target_path
