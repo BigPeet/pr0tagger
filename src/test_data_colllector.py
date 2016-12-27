@@ -7,6 +7,4 @@ api.disableVideos()
 
 collector = data_collection.DataCollector(api)
 collector.setDataSource(data_collection.DataSources.THUMBNAIL)
-collector.setMediaDirectory("/tmp/test")
-collector.setAnnotationFile("/tmp/test/annotation.txt")
-last_id = collector.collectDataBatch()
+last_id = collector.collectDataBatch(download=False, save_json=True, local_data=False)
