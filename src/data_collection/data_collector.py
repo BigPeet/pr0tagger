@@ -23,15 +23,23 @@ class DataCollector:
         self.api = api
         self.last_id = last_id
         self.age_threshold = timedelta(hours=5)
+        self.min_num_of_tags = 5
         self.search_forwards = True
         self.media_directory = "/tmp"
         self.data_source = DataSources.IMAGE
         self.annotation_file = "/tmp/annotation.txt"
         self.json_dir = "/tmp"
+        self.download_media = True
+        self.save_json = False
+        self.use_local_storage = False
+        self.last_batch_size = None
 
-    def setAgeThreshold(days=0, hours=5, minutes=0, seconds=0):
+    def setAgeThreshold(self, days=0, hours=5, minutes=0, seconds=0):
         self.age_threshold = timedelta(
             days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+    def setMinimumNumberOfTags(self, threshold):
+        self.min_num_of_tags = threshold
 
     def setLastId(self, last_id):
         self.last_id = last_id
@@ -57,6 +65,18 @@ class DataCollector:
     def setJsonDir(self, directory):
         self.json_dir = directory
 
+    def setDownloadMedia(self, download_media):
+        self.download_media = download_media
+
+    def setSaveJSON(self, save_json):
+        self.save_json = save_json
+
+    def setUseLocalStorage(self, use_local_storage):
+        self.use_local_storage = use_local_storage
+
+    def getSizeOfLastBatch(self):
+        return self.last_batch_size
+
     def download(self, item):
         if self.data_source == DataSources.IMAGE:
             return self.api.downloadMedia(
@@ -68,7 +88,7 @@ class DataCollector:
             return self.api.downloadFullsize(
                 item, save_dir=self.media_directory, file_name=item.id)
         else:
-            print "No valid data source chosen!"
+            print "No valid data source chosen:", str(self.data_source)
             return None
 
     def writeAnnotation(self, item, media_path):
@@ -84,7 +104,7 @@ class DataCollector:
         new_line += str(media_path) + ";"
         new_line += str(len(item.tags)) + ";"
         new_line += ";".join([str(tag.getText()) + ";" +
-                          str(tag.getConfidence()) for tag in item.tags])
+                              str(tag.getConfidence()) for tag in item.tags])
 
         # Check if the item already has an entry in the annotation file
         # and replace it.
@@ -126,10 +146,10 @@ class DataCollector:
         data.sort(reverse=True)
         return data
 
-    def collectDataBatch(self, download=True, save_json=False, data=[], local_data=False):
+    def collectDataBatch(self, data=[]):
         # retrieve data if none has been given
         if not data:
-            if local_data:
+            if self.use_local_storage:
                 data = self.getItemsFromLocalStorage()
             else:
                 data = self.getItemsFromAPI()
@@ -146,20 +166,22 @@ class DataCollector:
         if not valid_data:
             return
 
-        # save id of last item to fit age criteria in search direction
+        # save id of last item and size of batch to fit age criteria in search
+        # direction
         if self.search_forwards:
             self.last_id = valid_data[0].getSortId()
         else:
             self.last_id = valid_data[-1].getSortId()
+        self.last_batch_size = len(valid_data)
 
         for item in valid_data:
-            if download:
+            if self.download:
                 # download media
                 target_path = self.download(item)
                 if target_path:
                     # write id(s), link to media and tags to file
                     self.writeAnnotation(item, target_path)
-            if save_json:
+            if self.save_json:
                 with open(self.json_dir + "/" + str(item.id) + ".json", "w") as f:
                     json.dump(item.asDict(), f)
 

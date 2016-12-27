@@ -1,3 +1,6 @@
+import sys
+import time
+import datetime
 import argparse
 import pr0gramm
 import data_collection
@@ -57,7 +60,63 @@ def main():
 
 
 def run_collection_process(args):
-    pass
+    collector = initialize_collector(args)
+    waiting_time_in_seconds = args.waiting_time * 60 * 60
+
+    while(True):
+        sys.stdout.write("Collecting from {}.".format(collector.getLastId()))
+        sys.stdout.flush()
+
+        # collecting
+        collector.collectDataBatch()
+
+        sys.stdout.write(
+            " Reached: {0}. Collected {1} items.\n".format(
+                collector.getLastId(),
+                collector.getSizeOfLastBatch()))
+        sys.stdout.write("Going to sleep for {0} hours until {1}\n".format(
+            args.waiting_time,
+            datetime.datetime.now() + datetime.timedelta(hours=args.waiting_time)))
+        sys.stdout.flush()
+
+        # TODO: give some status updates while waiting
+        time.sleep(waiting_time_in_seconds)
+
+
+def initialize_collector(args):
+    api=initialize_api(args)
+
+    collector=data_collection.DataCollector(api)
+    collector.setLastId(args.last_id)
+    collector.setAgeThreshold(hours=args.age_threshold)
+    collector.setMinimumNumberOfTags(args.min_num_of_tags)
+    if args.search_backwards:
+        collector.useBackwardsSearch()
+    collector.setMediaDirectory(args.media_directory)
+    collector.setAnnotationFile(args.annotation_file)
+    collector.setJsonDir(args.json_directory)
+    collector.setDataSource(args.data_source)
+    collector.setDownloadMedia(not args.no_download)
+    collector.setSaveJSON(args.save_json)
+    collector.setUseLocalStorage(args.use_local_storage)
+
+    return collector
+
+
+def initialize_api(args):
+    api=pr0gramm.API()
+    if args.no_sfw:
+        api.disableSFW()
+    if args.nsfw:
+        api.enableNSFW()
+    if args.nsfl:
+        api.enableNSFL()
+    if args.no_images:
+        api.disableImages()
+    if args.allow_videos:
+        api.enableVideos()
+
+    return api
 
 
 if __name__ == "__main__":
