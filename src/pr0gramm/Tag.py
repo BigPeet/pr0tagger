@@ -16,5 +16,8 @@ class Tag:
     def getText(self):
         return self.text.encode("utf8")
 
+    def getConfidence(self):
+        return self.confidence
+
     def __str__(self):
         return self.getText()
