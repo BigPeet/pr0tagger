@@ -72,16 +72,37 @@ class DataCollector:
             return None
 
     def writeAnnotation(self, item, media_path):
+        # Read the current annotation file
+        content = []
+        if isfile(self.annotation_file):
+            with open(self.annotation_file, "r") as f:
+                content = f.readlines()
+
         # write every item as a line with the following structure:
         # ID;IMAGE_PATH;AMOUNT_OF_TAGS;...TAG_TEXT;TAG_CONFIDENCE;...
-        # TODO: maybe handle duplicate entries
-        with open(self.annotation_file, "a") as f:
-            line = str(item.id) + ";"
-            line += str(media_path) + ";"
-            line += str(len(item.tags)) + ";"
-            line += ";".join([str(tag.getText()) + ";" +
-                              str(tag.getConfidence()) for tag in item.tags])
-            f.write(line + "\n")
+        new_line = str(item.id) + ";"
+        new_line += str(media_path) + ";"
+        new_line += str(len(item.tags)) + ";"
+        new_line += ";".join([str(tag.getText()) + ";" +
+                          str(tag.getConfidence()) for tag in item.tags])
+
+        # Check if the item already has an entry in the annotation file
+        # and replace it.
+        contained = False
+        for i in range(len(content)):
+            if content[i].strip().startswith(str(item.id)):
+                content[i] = new_line
+                contained = True
+                break
+
+        # If no entry already exists, add a new line for the item
+        if not contained:
+            content.append(new_line)
+
+        # Write the new content to the file.
+        with open(self.annotation_file, "w") as f:
+            for line in content:
+                f.write(line.strip() + "\n")
 
     def getItemsFromAPI(self):
         if self.search_forwards:
