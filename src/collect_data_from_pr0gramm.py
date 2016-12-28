@@ -88,8 +88,9 @@ def run_collection_process(args):
             args.waiting_time,
             datetime.datetime.now() + datetime.timedelta(hours=args.waiting_time)))
 
-        # TODO: give some status updates while waiting
-        time.sleep(waiting_time_in_seconds)
+        if collector.getSizeOfLastBatch() <= 0:
+            # TODO: give some status updates while waiting
+            time.sleep(waiting_time_in_seconds)
 
 
 def initialize_collector(args):

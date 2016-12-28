@@ -11,6 +11,7 @@ __date__ = "2016-12-26"
 
 LOG = logging.getLogger(__name__)
 
+
 class DataSources:
     IMAGE, THUMBNAIL, FULL_SIZE = range(3)
 
@@ -165,16 +166,16 @@ class DataCollector:
             if item.getAge() >= self.age_threshold and len(item.tags) > 0:
                 valid_data.append(item)
 
+        # save size of collected data batch
+        self.last_batch_size = len(valid_data)
         if not valid_data:
             return
 
-        # save id of last item and size of batch to fit age criteria in search
-        # direction
+        # save id of last item to fit age criteria in search direction
         if self.search_forwards:
             self.last_id = valid_data[0].getSortId()
         else:
             self.last_id = valid_data[-1].getSortId()
-        self.last_batch_size = len(valid_data)
 
         for item in valid_data:
             if self.download:
